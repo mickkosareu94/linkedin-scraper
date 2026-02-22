@@ -1,0 +1,9 @@
+__pycache__
+.env
+.venv
+venv
+.vscode
+.idea
+resume/resume.pdf
+seen_jobs/seen_jobs.json
+.DS_Store

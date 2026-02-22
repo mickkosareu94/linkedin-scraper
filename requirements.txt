@@ -1,0 +1,5 @@
+requests
+selectorlib
+pypdf
+google-genai
+python-dotenv
