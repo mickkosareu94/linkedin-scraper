@@ -14,6 +14,7 @@ and sends a plain-text email digest of new jobs.
 - Runs automatically every Friday via GitHub Actions — no server needed
 
 ## Project structure
+```
 linkedin-scraper/
 ├── main.py # Entry point, CLI, orchestrator
 ├── ai_job_match.py # Gemini AI matching
@@ -32,6 +33,7 @@ linkedin-scraper/
 ├── requirements.txt
 ├── README.md
 └── .gitignore
+```
 
 ## Environment variables (add in .env file locally)
 | Variable       | Description                                                               |
@@ -42,11 +44,11 @@ linkedin-scraper/
 | GMAIL_RECEIVER | Address to receive the digest                                             |
 
 ## Usage
-# Basic run — emails new jobs (5 by default), no CSV
+### Basic run — emails new jobs (5 by default), no CSV
 python main.py "QA Engineer" "Germany"
 
-# With custom job count
+### With custom job count
 python main.py "QA Engineer" "Germany" --max-jobs 50
 
-# Also write a local CSV
+### Also write a local CSV
 python main.py "QA Engineer" "Germany" --output jobs.csv
