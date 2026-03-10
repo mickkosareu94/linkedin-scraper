@@ -11,7 +11,6 @@ and sends a plain-text email digest of new jobs.
 - Matches each job against your resume using Gemini 2.5 Flash
 - Tracks seen jobs to send only new listings each run
 - Sends a formatted plain-text email digest via Gmail SMTP
-- Runs automatically every Friday via GitHub Actions — no server needed
 
 ## Project structure
 ```
@@ -44,11 +43,11 @@ linkedin-scraper/
 | GMAIL_RECEIVER | Address to receive the digest                                             |
 
 ## Usage
-### Basic run — emails new jobs (5 by default), no CSV
-python main.py "QA Engineer" "Germany"
+### Basic run — emails new jobs (5 by default), custom location, no CSV
+python main.py 'QA Engineer' --location 'Germany'
 
-### With custom job count
-python main.py "QA Engineer" "Germany" --max-jobs 50
+### With 2 job queries, custom location and custom job count
+python main.py 'QA Engineer' 'Test Automation Engineer' --location 'Germany' --max-jobs 25
 
-### Also write a local CSV
-python main.py "QA Engineer" "Germany" --output jobs.csv
+### Additionally write to a local CSV
+python main.py 'QA Engineer' --location 'Germany' --output jobs.csv

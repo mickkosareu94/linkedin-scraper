@@ -30,8 +30,11 @@ def scrape(url: str, params: dict = None) -> str:
 
 
 def extract_search(source: str) -> list[dict]:
-    result = search_extractor.extract(source)
-    return result.get('jobs') or []
+    result = search_extractor.extract(source).get('jobs') or []
+    for job in result:
+        if job.get('url'):
+            job['url'] = job['url'].split('?')[0]
+    return result
 
 
 def extract_detail(source: str) -> dict:
@@ -47,7 +50,9 @@ def run(keyword: str, location: str, max_jobs: int) -> list[dict]:
 
     # Loop until we have collected enough jobs or there are no more jobs to fetch
     while len(all_jobs) < max_jobs:
-        params = {'keywords': keyword, 'location': location, 'start': start}
+        params = {'keywords': keyword, 'start': start}
+        if location:
+            params['location'] = location
         print(f'  [search] start={start} | collected: {len(all_jobs)}')
         scraped_search = scrape(SEARCH_URL, params=params)
         jobs = extract_search(scraped_search)
@@ -60,7 +65,6 @@ def run(keyword: str, location: str, max_jobs: int) -> list[dict]:
 
     all_jobs = all_jobs[:max_jobs]  # Limit to max_jobs
     print(f'Collected {len(all_jobs)} jobs. Fetching details...')
-    resume_text = read_pdf(RESUME_PATH) 
 
     for index, job in enumerate(all_jobs):
         job_id = (job.get('job_id') or '').split(':')[-1]
@@ -74,9 +78,6 @@ def run(keyword: str, location: str, max_jobs: int) -> list[dict]:
         job.pop('job_id', None)
         time.sleep(2)
 
-    print(f'\n  [AI] Matching {len(all_jobs)} jobs against resume...')
-    match_all_jobs(resume_text, all_jobs)
-
     return all_jobs
 
 
@@ -84,18 +85,27 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='LinkedIn job scraper with AI matching'
     )
-    parser.add_argument('keyword', type=str, help='Job title to search for')
-    parser.add_argument('location', type=str, help='Location to search in')
+    parser.add_argument('keyword', type=str, nargs='+', help='One or more job titles')
+    parser.add_argument('--location', type=str, default=None, help='(Optional) Location')
     parser.add_argument(
-        '--max-jobs', type=int, default=5, help='Max number of jobs (default: 5)'
+        '--max-jobs', type=int, default=5, help='Max jobs per keyword (default: 5)'
     )
     parser.add_argument(
-        '--output', type=str, default=None, help='Optional CSV output path'
+        '--output', type=str, default=None, help='(Optional) CSV output path'
     )
     args = parser.parse_args()
 
-    jobs = run(args.keyword, args.location, args.max_jobs)
-    new_jobs = filter_new(jobs)
+    all_jobs = []
+    for kw in args.keyword:
+        print(f'\n[Search] {kw} in {args.location or "worldwide"}')
+        all_jobs.extend(run(kw, args.location, args.max_jobs))
+
+    new_jobs = filter_new(all_jobs)
+
+    if new_jobs:
+        print(f'\n  [AI] Matching {len(new_jobs)} jobs against resume...')
+        match_all_jobs(read_pdf(RESUME_PATH), new_jobs)
+
     if args.output:  # only writes CSV when --output is passed
         save_to_csv(new_jobs, args.output)
 
