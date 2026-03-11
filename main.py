@@ -24,8 +24,7 @@ detail_extractor = Extractor.from_yaml_file(DETAIL_YAML)
 
 def scrape(url: str, params: dict = None) -> str:
     response = requests.get(url, headers=HEADERS, params=params, timeout=10)
-    if response.status_code != 200:
-        raise Exception(f'Failed to fetch page: {response.status_code}')
+    response.raise_for_status()
     return response.text
 
 
