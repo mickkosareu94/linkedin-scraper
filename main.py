@@ -100,6 +100,7 @@ if __name__ == '__main__':
         all_jobs.extend(run(kw, args.location, args.max_jobs))
 
     new_jobs = filter_new(all_jobs)
+    new_jobs = new_jobs[:args.max_jobs]
 
     if new_jobs:
         print(f'\n  [AI] Matching {len(new_jobs)} jobs against resume...')
