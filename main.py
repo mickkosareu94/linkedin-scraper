@@ -99,7 +99,14 @@ if __name__ == '__main__':
         print(f'\n[Search] {kw} in {args.location or "worldwide"}')
         all_jobs.extend(run(kw, args.location, args.max_jobs))
 
-    new_jobs = filter_new(all_jobs)
+    seen_ids = set()
+    unique_jobs = []
+    for job in all_jobs:
+        if job['job_id'] not in seen_ids:
+            seen_ids.add(job['job_id'])
+            unique_jobs.append(job)
+
+    new_jobs = filter_new(unique_jobs)
     new_jobs = new_jobs[:args.max_jobs]
 
     if new_jobs:
